@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package geometa;
+
+service Foo {
+    rpc Bar (BarRequest) returns (BarResponse) {}
+}
+
+message BarRequest {
+    int64 baz = 1;
+}
+
+message BarResponse {
+    string qux = 1;
+}
