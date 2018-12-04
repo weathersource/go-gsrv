@@ -21,8 +21,11 @@ type datum struct {
 	resp   interface{}
 }
 
-// AdjustFunc is the signature for functions that adjust requests before querying matching data
-type AdjustFunc func(req proto.Message) proto.Message
+// AdjustFunc is the signature for functions that adjust requests before querying matching data.
+// Ensure inside AdjustFunc functions, you modify and return a copy of the original requests,
+// not pointers to the modified originals. This allows for running AdjustFunc multiple times
+// against multiple possible results
+type AdjustFunc func(wantReq proto.Message, gotReq proto.Message) (wantReqAdj proto.Message)
 
 // NewServer configures and returns a MockServer
 func NewServer() (*MockServer, error) {
@@ -66,27 +69,33 @@ func (s *MockServer) AddDataAdjust(rpc string, req proto.Message, resp interface
 	s.data[rpc] = append(s.data[rpc], datum{req, adjust, resp})
 }
 
-// invoke compares the request with the next expected (request, response) pair.
+// getData compares the request with the next expected (request, response) pair.
 // It returns the response, or an error if the request doesn't match what
 // was expected or there are no expected data.
-func (s *MockServer) invoke(rpc string, req proto.Message) (interface{}, error) {
+func (s *MockServer) getData(rpc string, wantReq proto.Message) (interface{}, error) {
 	_, ok := s.data[rpc]
 	if !ok {
 		return nil, errors.NewNotFoundError("The RPC could not be found.")
 	}
 
-	for _, datum := range s.data[rpc] {
-		thisReq := req
-		if datum.adjust != nil {
-			thisReq = datum.adjust(req)
+	for _, got := range s.data[rpc] {
+
+		if got.req != nil {
+
+			// Handle request adjustments with proper scope
+			wantReqAdj := wantReq
+			if got.adjust != nil {
+				wantReqAdj = got.adjust(wantReq, got.req)
+			}
+
+			if !proto.Equal(wantReqAdj, got.req) {
+				continue
+			}
 		}
-		if datum.req != nil && !proto.Equal(thisReq, datum.req) {
-			continue
-		}
-		if err, ok := datum.resp.(error); ok {
+		if err, ok := got.resp.(error); ok {
 			return nil, err
 		}
-		return datum.resp, nil
+		return got.resp, nil
 	}
 
 	return nil, errors.NewNotFoundError("The requested response object was not found.")

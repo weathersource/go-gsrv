@@ -20,7 +20,7 @@ func TestInvokeSimple(t *testing.T) {
 	)
 	assert.Equal(t, 1, len(s.data))
 
-	r, err := s.invoke("Bar", &pb.BarRequest{Baz: 1})
+	r, err := s.getData("Bar", &pb.BarRequest{Baz: 1})
 	assert.NotNil(t, r)
 	assert.Nil(t, err)
 
@@ -33,7 +33,7 @@ func TestInvokeNoRpc(t *testing.T) {
 	assert.NotNil(t, s)
 	assert.Nil(t, err)
 
-	r, err := s.invoke("Foo", nil)
+	r, err := s.getData("Foo", nil)
 	assert.Nil(t, r)
 	assert.NotNil(t, err)
 }
@@ -50,7 +50,7 @@ func TestInvokeMissingData(t *testing.T) {
 	)
 	assert.Equal(t, 1, len(s.data))
 
-	r, err := s.invoke("Bar", &pb.BarRequest{Baz: 2})
+	r, err := s.getData("Bar", &pb.BarRequest{Baz: 2})
 	assert.Nil(t, r)
 	assert.NotNil(t, err)
 
@@ -67,15 +67,15 @@ func TestInvokeAdjust(t *testing.T) {
 		"Bar",
 		&pb.BarRequest{Baz: 1},
 		&pb.BarResponse{Qux: "One"},
-		func(req proto.Message) proto.Message {
-			thisReq := *(req.(*pb.BarRequest))
-			thisReq.Baz++
-			return &thisReq
+		func(wantReq proto.Message, gotReq proto.Message) proto.Message {
+			wantReqAdj := *(wantReq.(*pb.BarRequest))
+			wantReqAdj.Baz++
+			return &wantReqAdj
 		},
 	)
 	assert.Equal(t, 1, len(s.data))
 
-	r, err := s.invoke("Bar", &pb.BarRequest{Baz: 0})
+	r, err := s.getData("Bar", &pb.BarRequest{Baz: 0})
 	assert.NotNil(t, r)
 	assert.Nil(t, err)
 
