@@ -14,12 +14,11 @@ func TestBarSuccess(t *testing.T) {
 	assert.NotNil(t, s)
 	assert.Nil(t, err)
 
-	s.AddData(
-		"Bar",
+	s.AddRPC(
 		&pb.BarRequest{Baz: 1},
 		&pb.BarResponse{Qux: "One"},
 	)
-	assert.Equal(t, 1, len(s.data))
+	assert.Equal(t, 1, len(s.resps))
 
 	r, err := s.Bar(context.Background(), &pb.BarRequest{Baz: 1})
 	assert.NotNil(t, r)
@@ -31,12 +30,11 @@ func TestBarError(t *testing.T) {
 	assert.NotNil(t, s)
 	assert.Nil(t, err)
 
-	s.AddData(
-		"Bar",
+	s.AddRPC(
 		&pb.BarRequest{Baz: 1},
 		errors.NewUnknownError("An unknown error occurred."),
 	)
-	assert.Equal(t, 1, len(s.data))
+	assert.Equal(t, 1, len(s.resps))
 
 	r, err := s.Bar(context.Background(), &pb.BarRequest{Baz: 1})
 	assert.Nil(t, r)

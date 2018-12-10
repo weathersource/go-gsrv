@@ -7,7 +7,7 @@ import (
 
 // Bar implements the FooServer Bar method
 func (s *MockServer) Bar(_ context.Context, req *pb.BarRequest) (*pb.BarResponse, error) {
-	res, err := s.getData("Bar", req)
+	res, err := s.popRPC(req)
 	if err != nil {
 		return nil, err
 	}

@@ -8,77 +8,77 @@ import (
 	pb "github.com/weathersource/go-gsrv/examples/foo/proto"
 )
 
-func TestInvokeSimple(t *testing.T) {
+func TestReset(t *testing.T) {
 	s, err := NewServer()
 	assert.NotNil(t, s)
 	assert.Nil(t, err)
 
-	s.AddData(
-		"Bar",
+	s.AddRPC(
 		&pb.BarRequest{Baz: 1},
 		&pb.BarResponse{Qux: "One"},
 	)
-	assert.Equal(t, 1, len(s.data))
+	assert.Equal(t, 1, len(s.resps))
 
-	r, err := s.getData("Bar", &pb.BarRequest{Baz: 1})
+	s.Reset()
+	assert.Equal(t, 0, len(s.resps))
+}
+
+func TestPopRPCSimple(t *testing.T) {
+	s, err := NewServer()
+	assert.NotNil(t, s)
+	assert.Nil(t, err)
+
+	s.AddRPC(
+		&pb.BarRequest{Baz: 1},
+		&pb.BarResponse{Qux: "One"},
+	)
+
+	r, err := s.popRPC(&pb.BarRequest{Baz: 1})
 	assert.NotNil(t, r)
 	assert.Nil(t, err)
-
-	s.Reset()
-	assert.Equal(t, 0, len(s.data))
 }
 
-func TestInvokeNoRpc(t *testing.T) {
+func TestPopRPCNoRpc(t *testing.T) {
 	s, err := NewServer()
 	assert.NotNil(t, s)
 	assert.Nil(t, err)
 
-	r, err := s.getData("Foo", nil)
-	assert.Nil(t, r)
-	assert.NotNil(t, err)
+	panicTest := func() {
+		s.popRPC(nil)
+	}
+	assert.Panics(t, panicTest)
 }
 
-func TestInvokeMissingData(t *testing.T) {
+func TestPopRPCMissingData(t *testing.T) {
 	s, err := NewServer()
 	assert.NotNil(t, s)
 	assert.Nil(t, err)
 
-	s.AddData(
-		"Bar",
+	s.AddRPC(
 		&pb.BarRequest{Baz: 1},
 		&pb.BarResponse{Qux: "One"},
 	)
-	assert.Equal(t, 1, len(s.data))
 
-	r, err := s.getData("Bar", &pb.BarRequest{Baz: 2})
+	r, err := s.popRPC(&pb.BarRequest{Baz: 2})
 	assert.Nil(t, r)
 	assert.NotNil(t, err)
-
-	s.Reset()
-	assert.Equal(t, 0, len(s.data))
 }
 
-func TestInvokeAdjust(t *testing.T) {
+func TestPopRPCAdjust(t *testing.T) {
 	s, err := NewServer()
 	assert.NotNil(t, s)
 	assert.Nil(t, err)
 
-	s.AddDataAdjust(
-		"Bar",
-		&pb.BarRequest{Baz: 1},
+	wantReq := &pb.BarRequest{Baz: 1}
+	s.AddRPCAdjust(
+		wantReq,
 		&pb.BarResponse{Qux: "One"},
-		func(wantReq proto.Message, gotReq proto.Message) proto.Message {
-			wantReqAdj := *(wantReq.(*pb.BarRequest))
-			wantReqAdj.Baz++
-			return &wantReqAdj
+		func(gotReq proto.Message) {
+			wantReq.Baz = gotReq.(*pb.BarRequest).Baz
 		},
 	)
-	assert.Equal(t, 1, len(s.data))
 
-	r, err := s.getData("Bar", &pb.BarRequest{Baz: 0})
+	r, err := s.popRPC(&pb.BarRequest{Baz: 9})
 	assert.NotNil(t, r)
 	assert.Nil(t, err)
-
-	s.Reset()
-	assert.Equal(t, 0, len(s.data))
 }
