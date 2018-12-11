@@ -19,15 +19,13 @@ func main() {
 	}
 
 	// populate server
-	srv.AddData(
-		"Bar",
+	srv.AddRPC(
 		&pb.BarRequest{Baz: 1},
 		&pb.BarResponse{Qux: "One"},
 	)
-	srv.AddData(
-		"Bar",
+	srv.AddRPC(
 		&pb.BarRequest{Baz: 2},
-		errors.NewUnknownError("An unknown error occurred."),
+		errors.NewNotFoundError("An unknown error occurred."),
 	)
 
 	// Set up a connection to the server.
