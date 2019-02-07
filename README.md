@@ -1,9 +1,9 @@
 # go-gsrv
 
-[![GoDoc](https://godoc.org/github.com/weathersource/go-gsrv?status.svg)](https://godoc.org/github.com/weathersource/go-gsrv)
+[![Build Status](https://travis-ci.com/weathersource/go-gsrv.svg?branch=master)](https://travis-ci.com/weathersource/go-gsrv)
+[![Codevov](https://img.shields.io/codecov/c/github/weathersource/go-gsrv.svg)](https://codecov.io/gh/weathersource/go-gsrv)
 [![Go Report Card](https://goreportcard.com/badge/github.com/weathersource/go-gsrv)](https://goreportcard.com/report/github.com/weathersource/go-gsrv)
-[![Build Status](https://travis-ci.org/weathersource/go-gsrv.svg)](https://travis-ci.org/weathersource/go-gsrv)
-[![Codevov](https://codecov.io/gh/weathersource/go-gsrv/branch/master/graphs/badge.svg)](https://codecov.io/gh/weathersource/go-gsrv)
+[![GoDoc](https://img.shields.io/badge/godoc-ref-blue.svg)](https://godoc.org/github.com/weathersource/go-gsrv)
 
 Package gsrv creates a test gRPC server that is useful when mocking a gRPC service.
 
