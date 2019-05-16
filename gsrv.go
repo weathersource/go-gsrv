@@ -21,7 +21,7 @@ const (
 	Running
 	// Closed Server status means the server has been closed
 	Closed
-	// ClosedWithError Server statusmeans the server was closed because of an error.
+	// ClosedWithError Server status means the server was closed because of an error.
 	ClosedWithError
 )
 
