@@ -3,7 +3,7 @@ package mockfoo
 import (
 	"testing"
 
-	proto "github.com/golang/protobuf/proto"
+	proto "google.golang.org/protobuf/proto"
 	assert "github.com/stretchr/testify/assert"
 	pb "github.com/weathersource/go-gsrv/examples/foo/proto"
 )

@@ -4,7 +4,7 @@ package mockfoo
 import (
 	"fmt"
 
-	proto "github.com/golang/protobuf/proto"
+	proto "google.golang.org/protobuf/proto"
 	errors "github.com/weathersource/go-errors"
 	gsrv "github.com/weathersource/go-gsrv"
 	pb "github.com/weathersource/go-gsrv/examples/foo/proto"
